@@ -7,6 +7,7 @@ import { getCurrentWeekNumber, getWeekByNumber } from './data/readingPlan';
 function App() {
   const [currentWeekNumber, setCurrentWeekNumber] = useState(1);
   const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
   const currentWeek = getWeekByNumber(currentWeekNumber);
   const actualCurrentWeek = getCurrentWeekNumber();
   
@@ -19,16 +20,19 @@ function App() {
   const handlePreviousWeek = () => {
     if (currentWeekNumber > 1) {
       setCurrentWeekNumber(currentWeekNumber - 1);
+      setStatusMessage(`Navigated to week ${currentWeekNumber - 1}`);
     }
   };
   
   const handleNextWeek = () => {
     // No upper limit - can go as far into the future as needed
     setCurrentWeekNumber(currentWeekNumber + 1);
+    setStatusMessage(`Navigated to week ${currentWeekNumber + 1}`);
   };
   
   const handleGoToCurrentWeek = () => {
     setCurrentWeekNumber(actualCurrentWeek);
+    setStatusMessage('Navigated to current week');
   };
 
   const handlePrint = () => {
@@ -54,11 +58,29 @@ function App() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col">
+      {/* Skip to main content link for keyboard navigation */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50"
+      >
+        Skip to main content
+      </a>
+      
       <Navigation
         onPrint={handlePrint}
       />
       
-      <main className="flex-1 max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 w-full">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 w-full">
+        {/* Screen reader live region for status announcements */}
+        <div 
+          className="sr-only" 
+          aria-live="polite" 
+          aria-atomic="true"
+          role="status"
+        >
+          {statusMessage}
+        </div>
+        
         <div className="px-4 py-6 sm:px-0">
           <WeeklyReadingComponent 
             week={currentWeek} 

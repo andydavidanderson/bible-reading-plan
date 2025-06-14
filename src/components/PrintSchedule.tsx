@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import { getWeekByNumber, getCurrentWeekNumber } from '../data/readingPlan';
 import type { WeeklyReading } from '../data/readingPlan';
@@ -26,6 +26,24 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
   const [startDate, setStartDate] = useState(getTodayString()); // Default to today
   const [numberOfWeeks, setNumberOfWeeks] = useState(13); // Default to 3 months
   const [isGenerating, setIsGenerating] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Focus management for accessibility
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    // Focus the dialog when it opens
+    if (dialogRef.current) {
+      dialogRef.current.focus();
+    }
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
 
   const generatePrintableSchedule = () => {
     setIsGenerating(true);
@@ -173,6 +191,15 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
               padding-top: 6px !important;
             }
             
+            .week-group {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+            
+            .week-group:not(:first-child) {
+              page-break-before: auto;
+            }
+            
             @media print {
               body { 
                 margin: 10px;
@@ -216,9 +243,9 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
                 <th>Psalms/Proverbs</th>
               </tr>
             </thead>
-            <tbody>
-              ${weeks.map((week, weekIndex) => 
-                week.days.map((day, dayIndex) => {
+            ${weeks.map((week, weekIndex) => 
+              `<tbody class="week-group">
+                ${week.days.map((day, dayIndex) => {
                   const oldTestament = day.readings.filter(r => !isNewTestament(r.book) && !isPsalmOrProverb(r.book));
                   const newTestament = day.readings.filter(r => isNewTestament(r.book));
                   const psalmsProverbs = day.readings.filter(r => isPsalmOrProverb(r.book));
@@ -244,9 +271,9 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
                       </td>
                     </tr>
                   `;
-                }).join('')
-              ).join('')}
-            </tbody>
+                }).join('')}
+              </tbody>`
+            ).join('')}
           </table>
         </body>
       </html>
@@ -269,15 +296,28 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-200">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="print-dialog-title"
+    >
+      <div 
+        ref={dialogRef}
+        className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-200"
+        tabIndex={-1}
+      >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <h2 
+            id="print-dialog-title"
+            className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+          >
             🖨️ Print Reading Schedule
           </h2>
           <button 
-            className="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 cursor-pointer transition-colors duration-200"
             onClick={onClose}
+            aria-label="Close dialog"
           >
             <span className="sr-only">Close</span>
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -297,7 +337,11 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              aria-describedby="start-date-help"
             />
+            <div id="start-date-help" className="sr-only">
+              Select the date to start your reading schedule. The schedule will begin from the Monday of the selected week.
+            </div>
           </div>
           
           <div>
@@ -309,6 +353,7 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
               value={numberOfWeeks}
               onChange={(e) => setNumberOfWeeks(Number(e.target.value))}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              aria-describedby="weeks-help"
             >
               <option value={4}>1 month (4 weeks)</option>
               <option value={13}>3 months (13 weeks)</option>
@@ -317,17 +362,20 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
               <option value={104}>2 years (104 weeks)</option>
               <option value={156}>3 years (156 weeks)</option>
             </select>
+            <div id="weeks-help" className="sr-only">
+              Choose how many weeks to include in your printable schedule.
+            </div>
           </div>
           
           <div className="flex justify-end space-x-3 pt-4">
             <button
-              className="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+              className="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer transition-all duration-200"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
-              className="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200"
               onClick={generatePrintableSchedule}
               disabled={isGenerating}
             >

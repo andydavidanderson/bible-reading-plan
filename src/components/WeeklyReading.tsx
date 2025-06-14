@@ -38,15 +38,16 @@ export const WeeklyReadingComponent = ({
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-8">
+    <section className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
+      <header className="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-8">
         <div className="flex items-center justify-between">
           <button
             onClick={onPreviousWeek}
             disabled={currentWeek <= 1}
-            className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200"
+            aria-label="Go to previous week"
           >
-            <span className="text-xl">←</span>
+            <span className="text-xl" aria-hidden="true">←</span>
           </button>
           
           <div className="text-center flex-1 mx-6">
@@ -62,7 +63,7 @@ export const WeeklyReadingComponent = ({
               {!isCurrentWeek && (
                 <button
                   onClick={onGoToCurrentWeek}
-                  className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-full transition-all duration-200"
+                  className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-full cursor-pointer transition-all duration-200"
                 >
                   Back To Today's Reading
                 </button>
@@ -72,21 +73,25 @@ export const WeeklyReadingComponent = ({
           
           <button
             onClick={onNextWeek}
-            className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+            className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-all duration-200"
+            aria-label="Go to next week"
           >
-            <span className="text-xl">→</span>
+            <span className="text-xl" aria-hidden="true">→</span>
           </button>
         </div>
-      </div>
+      </header>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-8">
+      <main 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-8"
+        aria-label="Daily reading schedule for the week"
+      >
         {week.days.map((daily, index) => (
           <DailyReadingComponent 
             key={`${daily.date}-${index}`} 
             daily={daily} 
           />
         ))}
-      </div>
-    </div>
+      </main>
+    </section>
   );
 };

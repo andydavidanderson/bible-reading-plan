@@ -11,7 +11,7 @@ export const Navigation = ({
         <div className="flex justify-between items-center h-16">
           <div>
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center shadow-sm" aria-hidden="true">
                 <span className="text-white text-lg">📖</span>
               </div>
               <h1 className="text-2xl font-light text-slate-800">
@@ -23,8 +23,9 @@ export const Navigation = ({
           <div className="flex items-center">
             <button
               onClick={onPrint}
-              className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all duration-200"
+              className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 cursor-pointer transition-all duration-200"
               title="Print Schedule"
+              aria-label="Print reading schedule"
             >
               Print
             </button>

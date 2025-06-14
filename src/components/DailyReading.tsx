@@ -26,6 +26,13 @@ const ReadingItem = ({ reading }: ReadingItemProps) => {
       window.open(generateESVUrl(), '_blank');
     }
   };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (isValid && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      handleClick();
+    }
+  };
   
   // Determine the reading type with higher contrast backgrounds
   const getReadingStyle = () => {
@@ -46,6 +53,10 @@ const ReadingItem = ({ reading }: ReadingItemProps) => {
     <div 
       className={`${getReadingStyle()} border-l-4 pl-4 py-3 rounded-lg transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${isValid ? 'cursor-pointer' : 'cursor-default'}`}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={isValid ? 0 : -1}
+      role={isValid ? "button" : undefined}
+      aria-label={isValid ? `Open ${reading.book} chapter ${reading.chapter} in ESV.org` : undefined}
       title={isValid ? 'Click to open in ESV.org' : 'Invalid book/chapter reference'}
     >
       <span 
@@ -69,8 +80,11 @@ export const DailyReadingComponent = ({ daily }: DailyReadingProps) => {
   };
   
   return (
-    <div className={`${getBorderAndBgClass()} rounded-xl border p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}>
-      <div className="mb-5">
+    <article 
+      className={`${getBorderAndBgClass()} rounded-xl border p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}
+      aria-label={`Reading for ${daily.dayOfWeek}, ${formatShortDate(daily.date)}`}
+    >
+      <header className="mb-5">
         <h3 className="text-xl font-semibold text-gray-900 mb-1">
           {daily.dayOfWeek}
         </h3>
@@ -79,21 +93,27 @@ export const DailyReadingComponent = ({ daily }: DailyReadingProps) => {
             {formatShortDate(daily.date)}
           </p>
           {isToday && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 text-white">
+            <span 
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 text-white"
+              aria-label="Today's reading"
+            >
               Today
             </span>
           )}
         </div>
-      </div>
+      </header>
       
-      <div className="space-y-2">
+      <div 
+        className="space-y-2"
+        role="list"
+        aria-label="Bible readings for this day"
+      >
         {daily.readings.map((reading, index) => (
-          <ReadingItem
-            key={`${index}-${reading.book}-${reading.chapter}`}
-            reading={reading}
-          />
+          <div key={`${index}-${reading.book}-${reading.chapter}`} role="listitem">
+            <ReadingItem reading={reading} />
+          </div>
         ))}
       </div>
-    </div>
+    </article>
   );
 };
