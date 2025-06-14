@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { WeeklyReadingComponent } from './components/WeeklyReading';
 import { PrintSchedule } from './components/PrintSchedule';
-import { readingPlan, getCurrentWeekNumber, getWeekByNumber } from './data/readingPlan';
+import { getCurrentWeekNumber, getWeekByNumber } from './data/readingPlan';
 
 function App() {
   const [currentWeekNumber, setCurrentWeekNumber] = useState(1);
@@ -10,14 +10,9 @@ function App() {
   const currentWeek = getWeekByNumber(currentWeekNumber);
   const actualCurrentWeek = getCurrentWeekNumber();
   
-  console.log('App state - currentWeekNumber:', currentWeekNumber);
-  console.log('App state - currentWeek:', currentWeek);
-  console.log('App state - readingPlan:', readingPlan);
-  
   useEffect(() => {
     // Set to current week on initial load, but fallback to 1 if issues
     const weekToSet = actualCurrentWeek || 1;
-    console.log('Setting week to:', weekToSet);
     setCurrentWeekNumber(weekToSet);
   }, [actualCurrentWeek]);
   

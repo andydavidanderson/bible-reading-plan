@@ -28,20 +28,12 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePrintableSchedule = () => {
-    console.log('🚀 Generate button clicked!');
     setIsGenerating(true);
     
     try {
-      console.log('Starting print schedule generation...');
-      
       // Simple approach: get the reading plan for the week containing the selected date
       const weeks: WeeklyReading[] = [];
       const selectedDate = new Date(startDate + 'T00:00:00');
-      
-      console.log('Selected date:', selectedDate);
-      console.log('Start date string:', startDate);
-      console.log('Selected date day of week:', selectedDate.getDay()); // 0=Sunday, 1=Monday, etc.
-      console.log('Selected date formatted:', selectedDate.toISOString().split('T')[0]);
       
       // Calculate which week number this corresponds to
       const planStart = new Date('2025-06-09T00:00:00');
@@ -49,28 +41,15 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       const startWeekNumber = Math.floor(diffDays / 7) + 1;
       
-      console.log('Plan start:', planStart);
-      console.log('Diff time (ms):', diffTime);
-      console.log('Diff days:', diffDays, 'Start week number:', startWeekNumber);
-      
       // Generate the requested number of weeks starting exactly from the selected date
       for (let i = 0; i < numberOfWeeks; i++) {
         const weekNumber = startWeekNumber + i;
-        console.log(`Getting week ${weekNumber}...`);
         
         const week = getWeekByNumber(weekNumber);
         if (week) {
-          console.log(`✅ Got week ${weekNumber}:`, week);
-          
           // Create a completely custom week with dates starting from the selected date
           const weekStartDate = new Date(selectedDate.getTime() + (i * 7 * 24 * 60 * 60 * 1000));
           const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          
-          console.log(`Week ${i + 1} start date calculation:`);
-          console.log(`  selectedDate: ${selectedDate.toISOString().split('T')[0]}`);
-          console.log(`  i: ${i}, days to add: ${i * 7}`);
-          console.log(`  weekStartDate: ${weekStartDate.toISOString().split('T')[0]}`);
-          console.log(`  weekStartDate day of week: ${weekStartDate.getDay()}`);
           
           const customWeek = {
             ...week,
@@ -79,7 +58,6 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
             endDate: new Date(weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             days: week.days.map((day, dayIndex) => {
               const customDate = new Date(weekStartDate.getTime() + dayIndex * 24 * 60 * 60 * 1000);
-              console.log(`    Day ${dayIndex}: ${customDate.toISOString().split('T')[0]} (${dayNames[customDate.getDay()]})`);
               return {
                 ...day,
                 date: customDate.toISOString().split('T')[0],
@@ -88,31 +66,21 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
             })
           };
           
-          console.log(`📅 Custom week ${i + 1} dates:`, customWeek.days.map(d => `${d.dayOfWeek}-${d.date}`));
           weeks.push(customWeek);
-        } else {
-          console.error(`❌ Could not get week ${weekNumber}`);
         }
       }
       
-      console.log('Final weeks array:', weeks);
-      
       if (weeks.length === 0) {
-        console.error('❌ No weeks generated!');
-        alert('Error: Could not generate weeks. Check console for details.');
+        alert('Error: Could not generate weeks. Please try a different date.');
         return;
       }
       
-      console.log('📄 Creating printable content...');
       createPrintableContent(weeks);
-      console.log('✅ Print content created!');
       
     } catch (error) {
-      console.error('❌ Error generating schedule:', error);
       alert('Error generating schedule: ' + String(error));
     } finally {
       setIsGenerating(false);
-      console.log('🏁 Generation complete, isGenerating set to false');
     }
   };
 
@@ -132,18 +100,13 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
   };
 
   const createPrintableContent = (weeks: WeeklyReading[]) => {
-    console.log('📄 createPrintableContent called with weeks:', weeks);
-    
     try {
       // Create a new window for printing
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
-        console.error('❌ Could not open print window - popup might be blocked');
         alert('Could not open print window. Please allow popups for this site.');
         return;
       }
-      
-      console.log('✅ Print window opened successfully');
 
       const html = `
       <!DOCTYPE html>
@@ -325,14 +288,11 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
       </html>
     `;
 
-    console.log('📝 Writing HTML to print window...');
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
-    console.log('✅ HTML written successfully');
     
     } catch (error) {
-      console.error('❌ Error creating print content:', error);
       alert('Error creating print content: ' + String(error));
     }
   };

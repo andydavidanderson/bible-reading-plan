@@ -1,5 +1,3 @@
-console.log('🚀 Starting reading plan generation...');
-
 export interface Reading {
   book: string;
   chapter: number;
@@ -279,29 +277,6 @@ export function getWeekByNumberDynamic(weekNumber: number): WeeklyReading | null
 // Generate the reading plan - this can be extended to any number of weeks
 export const readingPlan: WeeklyReading[] = generateReadingPlan(1000); // Generate ~19 years worth
 
-console.log('📚 Reading plan generated with', readingPlan.length, 'weeks (~' + Math.round(readingPlan.length/52) + ' years)');
-
-// Calculate and log track lengths for debugging
-function getTrackLength(track: 'primary' | 'secondary' | 'psalms'): number {
-  let total = 0;
-  for (const book of readingPlanConfig.tracks[track]) {
-    const endChapter = book.endChapter ?? book.startChapter;
-    total += (endChapter - book.startChapter + 1);
-  }
-  return total;
-}
-
-console.log('📖 Old Testament track:', getTrackLength('primary'), 'chapters');
-console.log('📖 New Testament track:', getTrackLength('secondary'), 'chapters');  
-console.log('📖 Psalms/Proverbs track:', getTrackLength('psalms'), 'chapters');
-
-if (readingPlan.length > 0) {
-  console.log('📅 First week:', readingPlan[0]);
-  console.log('🏁 Last week:', readingPlan[readingPlan.length - 1]);
-} else {
-  console.log('❌ No weeks generated!');
-}
-
 // Helper function to get current week based on date
 export function getCurrentWeekNumber(): number {
   // Get the actual current date
@@ -315,12 +290,6 @@ export function getCurrentWeekNumber(): number {
   const diffTime = today.getTime() - planStart.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   const weekNumber = Math.floor(diffDays / 7) + 1;
-  
-  console.log('Today:', today);
-  console.log('Plan start:', planStart);
-  console.log('Diff days:', diffDays);
-  console.log('Calculated week number:', weekNumber);
-  console.log('Total weeks available:', readingPlan.length);
   
   // Return the calculated week, bounded by available weeks
   return Math.max(1, Math.min(weekNumber, readingPlan.length));

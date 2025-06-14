@@ -1,4 +1,4 @@
-import { format, parseISO, isToday, isBefore, isAfter } from 'date-fns';
+import { format, parseISO, isToday, isBefore } from 'date-fns';
 
 export const formatDate = (dateString: string): string => {
   try {
@@ -33,17 +33,6 @@ export const isDatePast = (dateString: string): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return isBefore(date, today);
-  } catch {
-    return false;
-  }
-};
-
-export const isDateFuture = (dateString: string): boolean => {
-  try {
-    const date = parseISO(dateString);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    return isAfter(date, today);
   } catch {
     return false;
   }

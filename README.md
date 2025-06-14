@@ -1,54 +1,92 @@
-# React + TypeScript + Vite
+# Bible Reading Plan
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A beautiful, modern Bible reading plan application built with React, TypeScript, and Tailwind CSS. This app provides a structured approach to reading through the Bible with Old Testament, New Testament, and Psalms/Proverbs tracks.
 
-Currently, two official plugins are available:
+## 🌟 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Weekly Reading Schedule**: View current week's readings with clear daily breakdown
+- **Three Reading Tracks**: 
+  - Old Testament books
+  - New Testament books  
+  - Psalms and Proverbs
+- **Navigation**: Navigate between weeks with easy-to-use controls
+- **Go to Today**: Quick button to jump to current week
+- **Print Functionality**: Generate printable schedules for 1 month to 3 years
+- **Responsive Design**: Beautiful, modern UI that works on all devices
+- **Progress Tracking**: Visual indicators for today's readings
+- **Infinite Planning**: Generate reading plans infinitely into the future
 
-## Expanding the ESLint configuration
+## 🖨️ Print Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Multiple Durations**: Print schedules for 1 month, 3 months, 6 months, 1 year, 2 years, or 3 years
+- **Custom Start Date**: Begin your reading plan on any date
+- **Printer-Friendly**: Optimized layout with minimal ink usage
+- **Week Groupings**: Visual separation between weeks for easy following
+- **Page Break Protection**: Weeks never get split across pages
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🚀 Live Demo
+
+Visit the live app: [https://andydavidanderson.github.io/bible-reading-plan/](https://andydavidanderson.github.io/bible-reading-plan/)
+
+## 💻 Technology Stack
+
+- **React 19** with TypeScript
+- **Vite** for fast development and building
+- **Tailwind CSS v4** for modern styling
+- **Date-fns** for date manipulation
+- **GitHub Pages** for free hosting
+
+## 🏃‍♂️ Development
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Setup
+```bash
+# Clone the repository
+git clone https://github.com/andydavidanderson/bible-reading-plan.git
+cd bible-reading-plan
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Build
+```bash
+# Build for production
+npm run build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+# Preview production build
+npm run preview
 ```
+
+### Deploy
+```bash
+# Deploy to GitHub Pages
+npm run deploy
+```
+
+## 📖 Reading Plan Structure
+
+The reading plan is designed to provide balanced daily Bible reading:
+
+- **Monday-Friday**: Old Testament + New Testament readings
+- **Wednesday**: Includes Psalms
+- **Weekend**: Lighter reading schedule
+- **Systematic Progress**: Covers the entire Bible over time
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 📧 Contact
+
+Created by Andy Anderson - feel free to contact me!
