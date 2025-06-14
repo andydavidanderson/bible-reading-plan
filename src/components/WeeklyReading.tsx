@@ -64,7 +64,7 @@ export const WeeklyReadingComponent = ({
                   onClick={onGoToCurrentWeek}
                   className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-full transition-all duration-200"
                 >
-                  Back to This Week
+                  Back To Today's Reading
                 </button>
               )}
             </div>

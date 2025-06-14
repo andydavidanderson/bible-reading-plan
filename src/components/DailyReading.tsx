@@ -13,6 +13,20 @@ interface ReadingItemProps {
 const ReadingItem = ({ reading }: ReadingItemProps) => {
   const isValid = validateReading(reading.book, reading.chapter);
   
+  // Generate ESV.org URL for the reading
+  const generateESVUrl = () => {
+    // ESV.org uses a specific format: https://www.esv.org/Genesis+1/
+    // Need to format book name and chapter for URL
+    const bookForUrl = reading.book.replace(/\s+/g, '+'); // Replace spaces with +
+    return `https://www.esv.org/${bookForUrl}+${reading.chapter}/`;
+  };
+
+  const handleClick = () => {
+    if (isValid) {
+      window.open(generateESVUrl(), '_blank');
+    }
+  };
+  
   // Determine the reading type with higher contrast backgrounds
   const getReadingStyle = () => {
     const book = reading.book.toLowerCase();
@@ -29,10 +43,13 @@ const ReadingItem = ({ reading }: ReadingItemProps) => {
   };
   
   return (
-    <div className={`${getReadingStyle()} border-l-4 pl-4 py-3 rounded-lg transition-all duration-200 hover:shadow-md hover:scale-[1.02]`}>
+    <div 
+      className={`${getReadingStyle()} border-l-4 pl-4 py-3 rounded-lg transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${isValid ? 'cursor-pointer' : 'cursor-default'}`}
+      onClick={handleClick}
+      title={isValid ? 'Click to open in ESV.org' : 'Invalid book/chapter reference'}
+    >
       <span 
-        className={`text-sm font-semibold ${!isValid ? 'text-red-700' : 'text-gray-900'}`}
-        title={!isValid ? 'Invalid book/chapter reference' : ''}
+        className={`text-sm font-semibold ${!isValid ? 'text-red-700' : 'text-gray-900 hover:text-blue-700'}`}
       >
         {reading.book} {reading.chapter}
         {!isValid && ' ⚠️'}
