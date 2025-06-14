@@ -54,15 +54,17 @@ export const WeeklyReadingComponent = ({
               {getWeekTitle()}
             </h2>
             <div className="flex items-center justify-center space-x-4">
-              <p className="text-slate-300 text-sm font-medium">
-                Daily Bible Reading
-              </p>
+              {isCurrentWeek && (
+                <p className="text-slate-300 text-sm font-medium">
+                  This Week's Reading
+                </p>
+              )}
               {!isCurrentWeek && (
                 <button
                   onClick={onGoToCurrentWeek}
                   className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-full transition-all duration-200"
                 >
-                  Go to Today
+                  Back to This Week
                 </button>
               )}
             </div>

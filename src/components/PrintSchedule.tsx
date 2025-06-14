@@ -35,20 +35,25 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
       const weeks: WeeklyReading[] = [];
       const selectedDate = new Date(startDate + 'T00:00:00');
       
-      // Calculate which week number this corresponds to
-      const planStart = new Date('2025-06-09T00:00:00');
-      const diffTime = selectedDate.getTime() - planStart.getTime();
+      // Find the Monday of the week containing the selected date
+      const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to days from Monday
+      const mondayOfWeek = new Date(selectedDate.getTime() - (daysFromMonday * 24 * 60 * 60 * 1000));
+      
+      // Calculate which week number this Monday corresponds to
+      const planStart = new Date('2025-06-09T00:00:00'); // This should be a Monday
+      const diffTime = mondayOfWeek.getTime() - planStart.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       const startWeekNumber = Math.floor(diffDays / 7) + 1;
       
-      // Generate the requested number of weeks starting exactly from the selected date
+      // Generate the requested number of weeks starting from the Monday
       for (let i = 0; i < numberOfWeeks; i++) {
         const weekNumber = startWeekNumber + i;
         
         const week = getWeekByNumber(weekNumber);
         if (week) {
-          // Create a completely custom week with dates starting from the selected date
-          const weekStartDate = new Date(selectedDate.getTime() + (i * 7 * 24 * 60 * 60 * 1000));
+          // Create a completely custom week with dates starting from the Monday
+          const weekStartDate = new Date(mondayOfWeek.getTime() + (i * 7 * 24 * 60 * 60 * 1000));
           const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           
           const customWeek = {
@@ -146,86 +151,47 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
               border-collapse: collapse;
               font-size: 11px;
               margin: 0 auto;
-              text-align: left;
             }
             
-            .date-header {
-              width: 90px;
+            .schedule-table th {
               padding: 8px 6px;
               text-align: center;
               font-weight: bold;
-              font-size: 11px;
               border-bottom: 2px solid #333;
+              background-color: #f8f9fa;
             }
             
-            .reading-header {
-              padding: 8px 6px;
-              text-align: center;
-              font-weight: bold;
-              font-size: 11px;
-              border-bottom: 2px solid #333;
-            }
-            
-            .day-row {
-              /* Normal spacing between days in same week */
-            }
-            
-            .day-row.week-start {
-              /* Reduced spacing before new week starts */
-              border-top: 6px solid transparent;
-            }
-            
-            .week-group {
-              page-break-inside: avoid;
-            }
-            
-            .date-cell {
-              padding: 1px 6px;
-              text-align: center;
-              font-weight: normal;
-              vertical-align: top;
-              width: 90px;
-            }
-            
-            .reading-cell {
-              padding: 1px 6px;
+            .schedule-table td {
+              padding: 4px 6px;
               text-align: center;
               vertical-align: top;
-              line-height: 1.1;
+              border-bottom: 1px solid #eee;
+            }
+            
+            .week-separator {
+              border-top: 2px solid #ddd !important;
+              padding-top: 6px !important;
             }
             
             @media print {
               body { 
-                margin: 10px auto;
-                font-size: 11px;
-                max-width: 100%;
-                text-align: center;
+                margin: 10px;
+                font-size: 10px;
               }
               .no-print { 
                 display: none; 
               }
               .schedule-table {
-                margin: 0 auto;
-                width: 600px !important;
-                max-width: 600px;
+                width: 100%;
+                font-size: 9px;
               }
-              .date-header {
-                width: 80px !important;
-                padding: 4px 2px !important;
+              .schedule-table th {
+                padding: 4px;
+                font-size: 9px;
               }
-              .reading-header {
-                padding: 4px 2px !important;
-                width: 140px !important;
-              }
-              .date-cell {
-                width: 80px !important;
-                padding: 1px 2px !important;
-                font-size: 10px;
-              }
-              .reading-cell {
-                padding: 1px 2px !important;
-                font-size: 10px;
-                width: 140px !important;
+              .schedule-table td {
+                padding: 2px 4px;
+                font-size: 9px;
               }
             }
           </style>
@@ -244,43 +210,41 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
           <table class="schedule-table">
             <thead>
               <tr>
-                <th class="date-header"></th>
-                <th class="reading-header">New Testament</th>
-                <th class="reading-header">Old Testament</th>
-                <th class="reading-header">Psalms/Proverbs</th>
+                <th></th>
+                <th>New Testament</th>
+                <th>Old Testament</th>
+                <th>Psalms/Proverbs</th>
               </tr>
             </thead>
             <tbody>
               ${weeks.map((week, weekIndex) => 
-                `<tbody class="week-group">
-                  ${week.days.map((day, dayIndex) => {
-                    const oldTestament = day.readings.filter(r => !isNewTestament(r.book) && !isPsalmOrProverb(r.book));
-                    const newTestament = day.readings.filter(r => isNewTestament(r.book));
-                    const psalmsProverbs = day.readings.filter(r => isPsalmOrProverb(r.book));
+                week.days.map((day, dayIndex) => {
+                  const oldTestament = day.readings.filter(r => !isNewTestament(r.book) && !isPsalmOrProverb(r.book));
+                  const newTestament = day.readings.filter(r => isNewTestament(r.book));
+                  const psalmsProverbs = day.readings.filter(r => isPsalmOrProverb(r.book));
 
-                    // Add extra spacing before the first day of each week (except the very first week)
-                    const isFirstDayOfWeek = dayIndex === 0;
-                    const isFirstWeek = weekIndex === 0;
-                    const rowClass = isFirstDayOfWeek && !isFirstWeek ? 'day-row week-start' : 'day-row';
+                  // Add week separator class for the first day of each week (except the very first week)
+                  const isFirstDayOfWeek = dayIndex === 0;
+                  const isFirstWeek = weekIndex === 0;
+                  const separatorClass = isFirstDayOfWeek && !isFirstWeek ? 'week-separator' : '';
 
-                    return `
-                      <tr class="${rowClass}">
-                        <td class="date-cell">
-                          ${day.dayOfWeek.substring(0, 3)}-${formatDateShort(day.date)}
-                        </td>
-                        <td class="reading-cell">
-                          ${newTestament.map(r => `${r.book} ${r.chapter}`).join('<br>')}
-                        </td>
-                        <td class="reading-cell">
-                          ${oldTestament.map(r => `${r.book} ${r.chapter}`).join('<br>')}
-                        </td>
-                        <td class="reading-cell">
-                          ${psalmsProverbs.map(r => `${r.book} ${r.chapter}`).join('<br>')}
-                        </td>
-                      </tr>
-                    `;
-                  }).join('')}
-                </tbody>`
+                  return `
+                    <tr>
+                      <td class="${separatorClass}">
+                        ${day.dayOfWeek.substring(0, 3)}-${formatDateShort(day.date)}
+                      </td>
+                      <td class="${separatorClass}">
+                        ${newTestament.map(r => `${r.book} ${r.chapter}`).join('<br>')}
+                      </td>
+                      <td class="${separatorClass}">
+                        ${oldTestament.map(r => `${r.book} ${r.chapter}`).join('<br>')}
+                      </td>
+                      <td class="${separatorClass}">
+                        ${psalmsProverbs.map(r => `${r.book} ${r.chapter}`).join('<br>')}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')
               ).join('')}
             </tbody>
           </table>
@@ -367,7 +331,7 @@ export const PrintSchedule = ({ onClose }: PrintScheduleProps) => {
               onClick={generatePrintableSchedule}
               disabled={isGenerating}
             >
-              {isGenerating ? '⏳ Generating...' : '🖨️ Generate & Print'}
+              {isGenerating ? '⏳ Generating...' : '🖨️ Show Printable Schedule'}
             </button>
           </div>
         </div>
