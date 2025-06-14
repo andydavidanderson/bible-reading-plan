@@ -53,12 +53,12 @@ function App() {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col">
       <Navigation
         onPrint={handlePrint}
       />
       
-      <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+      <main className="flex-1 max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 w-full">
         <div className="px-4 py-6 sm:px-0">
           <WeeklyReadingComponent 
             week={currentWeek} 
@@ -75,7 +75,7 @@ function App() {
         <PrintSchedule onClose={handleClosePrint} />
       )}
       
-      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">
+      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-gray-600">
             📖 Bible Reading Plan - Stay consistent in your daily reading journey
